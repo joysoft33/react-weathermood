@@ -1,0 +1,18 @@
+.Weather {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+.Weather table {
+  margin: auto;
+}
+.Weather img {
+  margin: auto;
+  text-align: center;
+  display: block;
+}
+.Weather table td:first-child {
+  text-align: right;
+  padding-right: 10px;
+  font-weight: lighter;
+}

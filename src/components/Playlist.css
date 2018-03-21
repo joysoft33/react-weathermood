@@ -1,0 +1,23 @@
+.Playlist {
+  border: 1px solid #eee;
+  display: inline-block;
+  width: 250px;
+  margin: 10px;
+}
+.Playlist:hover {
+  box-shadow: 0 0 18px #ccc;
+  cursor: pointer;
+}
+.Playlist .infos {
+  padding: 5px 10px;
+}
+.Playlist p {
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 5px 0;
+}
+.Playlist p:last-child {
+  font-weight: lighter;
+  font-size: 80%;
+}

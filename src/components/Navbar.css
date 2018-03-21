@@ -1,0 +1,16 @@
+.Navbar {
+  height: 70px;
+  padding: 5px;
+}
+.Navbar .Navbar-logo {
+  display: inline-block;
+  vertical-align: middle;
+}
+.Navbar .Navbar-logo > img {
+  width: 80px;
+}
+
+.Navbar .Navbar-item {
+  display: inline-block;
+  width: auto;
+}
