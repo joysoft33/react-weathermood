@@ -6,9 +6,9 @@ import { getTracks } from '../actions';
 
 import './Playlist.css';
 
-const Playlist = ({ playlist, onPlaylistClicked }) => {
+const Playlist = ({ playlist, onClickPlaylist }) => {
   return (
-    <div className="Playlist" onClick={() => onPlaylistClicked(playlist.id)}>
+    <div className="Playlist" onClick={() => onClickPlaylist(playlist.id)}>
       <img src={playlist.pictureUrl} alt={playlist.id} />
       <div className="infos">
         <p>{playlist.title}</p>
@@ -19,19 +19,19 @@ const Playlist = ({ playlist, onPlaylistClicked }) => {
 };
 
 Playlist.propTypes = {
-  onPlaylistClicked: PropTypes.func.isRequired,
+  onClickPlaylist: PropTypes.func.isRequired,
   playlist: PropTypes.shape({
-    id: PropTypes.number,
-    title: PropTypes.string,
-    tracksCount: PropTypes.number,
-    pictureUrl: PropTypes.string
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    tracksCount: PropTypes.number.isRequired,
+    pictureUrl: PropTypes.string.isRequired
   })
 };
 
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = dispatch => ({
-  onPlaylistClicked: id => {
+  onClickPlaylist: id => {
     dispatch(getTracks(id));
   }
 });
