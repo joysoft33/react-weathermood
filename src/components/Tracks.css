@@ -1,0 +1,21 @@
+.Tracks {
+  margin: 20px;
+}
+.Tracks table {
+  border-collapse: collapse;
+  border-color: #eee;
+  width: 100%;
+}
+.Tracks table tr {
+  border: 1px solid #ccc;
+}
+.Tracks table tr:hover {
+  background-color: #eee;
+  cursor: pointer;
+}
+.Tracks table tr.active {
+  background-color: #ccc;
+}
+.Tracks table td {
+  padding: 15px;
+}

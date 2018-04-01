@@ -2,43 +2,37 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { trackPause, trackPlay, trackNext } from '../actions';
+import { trackPlay, trackPause, trackNext } from '../actions';
 
 import './PlayCommands.css';
 
-const PlayCommands = ({ dispatch }) => {
-
-  this.play = true;
-
-  const onPlayToggle = evt => {
-    evt.preventDefault();
-    if (this.play) {
-      dispatch(trackPause());
-    } else {
-      dispatch(trackPlay());
-    }
-  };
-
-  const onPlayNext = evt => {
-    evt.preventDefault();
-    dispatch(trackNext());
-  };
-
-  const onPlayStop = evt => {
-    evt.preventDefault();
-  };
-
+const PlayCommands = props => {
+  const { playing, onPlayStart, onPlayPause, onPlayNext, onPlayStop } = props;
   return (
     <div className="PlayCommands">
-      <button type="button" onClick={onPlayToggle}>Play</button>
-      <button type="button" onClick={onPlayNext}>Next</button>
-      <button type="button" onClick={onPlayStop}>Stop</button>
+      <button onClick={playing ? onPlayPause : onPlayStart}>{playing ? 'Pause' : 'Play'}</button>
+      <button onClick={onPlayNext}>Next</button>
+      <button onClick={onPlayStop}>Stop</button>
     </div>
   );
 };
 
 PlayCommands.propTypes = {
-  dispatch: PropTypes.func.isRequired,
+  onPlayStart: PropTypes.func.isRequired,
+  onPlayPause: PropTypes.func.isRequired,
+  onPlayNext: PropTypes.func.isRequired,
+  onPlayStop: PropTypes.func.isRequired,
+  playing: PropTypes.bool
 };
 
-export default connect()(PlayCommands);
+const mapStateToProps = state => ({
+  playing: state.tracks.playing
+});
+
+const mapDispatchToProps = dispatch => ({
+  onPlayStart: () => dispatch(trackPlay()),
+  onPlayPause: () => dispatch(trackPause()),
+  onPlayNext: () => dispatch(trackNext())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PlayCommands);

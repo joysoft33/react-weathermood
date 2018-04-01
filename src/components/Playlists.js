@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import { getPlaylists } from '../actions';
 import Playlist from './Playlist';
@@ -9,12 +10,14 @@ import './Playlists.css';
 
 class Playlists extends React.Component {
   componentWillMount() {
-    this.props.getPlaylists(this.props.climate);
+    console.log('Playlists component will mount');
+    this.props.getPlaylists(this.props.meteo);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.climate !== this.props.climate) {
-      this.props.getPlaylists(nextProps.climate);
+    console.log('Playlists component props changed');
+    if (nextProps.meteo !== this.props.meteo) {
+      this.props.getPlaylists(nextProps.meteo);
     }
   }
 
@@ -31,7 +34,8 @@ class Playlists extends React.Component {
 }
 
 Playlists.propTypes = {
-  climate: PropTypes.string.isRequired,
+  getPlaylists: PropTypes.func.isRequired,
+  meteo: PropTypes.string,
   playlists: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number,
@@ -39,21 +43,18 @@ Playlists.propTypes = {
       tracksCount: PropTypes.number,
       pictureUrl: PropTypes.string
     })
-  ),
-  error: PropTypes.string,
-  getPlaylists: PropTypes.func.isRequired
+  )
 };
 
-const mapStateToProps = state => {
-  return {
-    ...(state.playlists)
-  };
-};
-
-const mapDispatchToProps = dispatch => ({
-  getPlaylists: climate => {
-    dispatch(getPlaylists(climate));
-  }
+const mapStateToProps = (state, { match }) => ({
+  meteo: match.params.meteo,
+  ...state.playlists
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Playlists);
+const mapDispatchToProps = dispatch => ({
+  getPlaylists: meteo => dispatch(getPlaylists(meteo))
+});
+
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(Playlists)
+);

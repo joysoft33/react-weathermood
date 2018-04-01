@@ -1,4 +1,4 @@
-import { actions } from '../actions';
+import { Actions } from '../actions';
 
 const initialState = {
   playlists: []
@@ -6,10 +6,10 @@ const initialState = {
 
 const Playlists = (state = initialState, action) => {
   switch (action.type) {
-    case actions.PLAYLISTS_SUCCESS:
+    case Actions.PLAYLISTS_SUCCESS:
       return { playlists: action.playlists };
 
-    case actions.PLAYLISTS_ERROR:
+    case Actions.PLAYLISTS_ERROR:
       return { error: action.error };
 
     default:

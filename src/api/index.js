@@ -1,9 +1,7 @@
-import * as weather from './weather';
-import * as deezer from './deezer';
+import Weather from './weather';
+import Deezer from './deezer';
 
-const api = {
-  ...weather,
-  ...deezer,
+export default {
+  Weather,
+  Deezer
 };
-
-export default api;

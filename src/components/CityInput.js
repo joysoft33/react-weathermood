@@ -2,37 +2,47 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { cityChange } from '../actions';
+import { cityChanged } from '../actions';
 
 import './CityInput.css';
 
-const CityInput = ({ dispatch }) => {
-  let input;
+class CityInput extends React.Component {
+  constructor(props) {
+    super(props);
+    this.city = props.city;
+  }
 
-  const onSubmit = e => {
-    e.preventDefault();
-    if (input.value.trim()) {
-      dispatch(cityChange(input.value));
-      input.value = '';
+  onSubmit = evt => {
+    evt.preventDefault();
+    if (this.city.value.trim()) {
+      this.props.cityChanged(this.city.value);
+      this.city.value = '';
     }
   };
 
-  return (
-    <div className="CityInput">
-      <form onSubmit={onSubmit}>
-        <input
-          ref={node => {
-            input = node;
-          }}
-        />
-        <button type="submit">GO!</button>
-      </form>
-    </div>
-  );
-};
+  render() {
+    return (
+      <div className="CityInput">
+        <form onSubmit={this.onSubmit}>
+          <input ref={node => (this.city = node)} defaultValue={this.city} />
+          <button type="submit">GO!</button>
+        </form>
+      </div>
+    );
+  }
+}
 
 CityInput.propTypes = {
-  dispatch: PropTypes.func.isRequired,
+  cityChanged: PropTypes.func.isRequired,
+  city: PropTypes.string
 };
 
-export default connect()(CityInput);
+const mapStateToProps = state => ({
+  city: state.city
+});
+
+const mapDispatchToProps = dispatch => ({
+  cityChanged: city => dispatch(cityChanged(city))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CityInput);

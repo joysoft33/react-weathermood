@@ -1,4 +1,5 @@
 import React from 'react';
+
 import CityInput from './CityInput';
 
 import logo from '../assets/images/logo.jpg';
@@ -8,7 +9,9 @@ const Navbar = () => {
   return (
     <nav className="Navbar">
       <div className="Navbar-logo">
-        <img src={logo} alt="Logo" />
+        <a href="/">
+          <img src={logo} alt="Logo" />
+        </a>
       </div>
       <div className="Navbar-item">
         <CityInput />

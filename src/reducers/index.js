@@ -1,15 +1,17 @@
-import { combineReducers } from 'redux';
-
+import city from './city';
 import weather from './weather';
 import playlists from './playlists';
 import tracks from './tracks';
-import track from './track';
 
-export default combineReducers({
+export default {
+  city,
   weather,
   playlists,
-  tracks,
-  track
+  tracks
+};
+
+export const getCity = state => ({
+  ...state.city
 });
 
 export const getWeather = state => ({

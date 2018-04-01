@@ -1,0 +1,12 @@
+.PlayCommands {
+  margin: 20px;
+}
+.PlayCommands button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  border-color: #eee;
+  background-color: white;
+}
+.PlayCommands button:hover {
+  background-color: #eee;
+}

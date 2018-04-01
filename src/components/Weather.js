@@ -2,53 +2,74 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import * as actions from '../actions';
+import { getWeather } from '../actions';
 
 import './Weather.css';
 
 class Weather extends React.Component {
+
+  componentWillReceiveProps(nextProps) {
+    console.log('Weather component props changed');
+    if (nextProps.city !== this.props.city) {
+      this.props.getWeather(nextProps.city);
+    }
+  }
+
   render() {
-    const { city, meteo, description, temperature, icon } = this.props;
-    return (
+    const { weather, error } = this.props;
+    return weather ? (
       <div className="Weather">
-        <img src={icon} alt="meteo" />
+        <img src={weather.icon} alt="meteo" />
         <table>
           <tbody>
             <tr>
               <td>City</td>
-              <td>{city}</td>
+              <td>{weather.city}</td>
             </tr>
             <tr>
               <td>Meteo</td>
-              <td>{meteo}</td>
+              <td>{weather.meteo}</td>
             </tr>
             <tr>
               <td>Description</td>
-              <td>{description}</td>
+              <td>{weather.description}</td>
             </tr>
             <tr>
               <td>Temperature</td>
-              <td>{temperature} °C</td>
+              <td>{weather.temperature} °C</td>
             </tr>
           </tbody>
         </table>
       </div>
+    ) : error ? (
+      <div className="Error">{error}</div>
+    ) : (
+      <div />
     );
   }
 }
 
 Weather.propTypes = {
-  city: PropTypes.string.isRequired,
-  meteo: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  temperature: PropTypes.number.isRequired,
-  icon: PropTypes.string.isRequired,
+  getWeather: PropTypes.func.isRequired,
+  city: PropTypes.string,
+  error: PropTypes.string,
+  weather: PropTypes.shape({
+    city: PropTypes.string,
+    meteo: PropTypes.string,
+    description: PropTypes.string,
+    temperature: PropTypes.number,
+    icon: PropTypes.string
+  })
 };
 
-const mapStateToProps = state => {
-  return {
-    ...(state.weather)
-  };
-};
+const mapStateToProps = state => ({
+  city: state.city,
+  error: state.weather.error,
+  weather: state.weather.weather
+});
 
-export default connect(mapStateToProps, actions)(Weather);
+const mapDispatchToProps = dispatch => ({
+  getWeather: city => dispatch(getWeather(city))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Weather);

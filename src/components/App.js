@@ -1,43 +1,29 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { Route, withRouter } from 'react-router-dom';
 
+import Navbar from './Navbar';
 import Weather from './Weather';
 import Playlists from './Playlists';
-import Navbar from './Navbar';
+import Tracks from './Tracks';
 
 import './App.css';
 
 class App extends React.Component {
   render() {
-    const { climate, error } = this.props;
     return (
-      <div className="App">
+      <div>
         <Navbar />
-        {climate && (
-          <div className="container">
-            <Weather />
-            <Playlists climate={climate} />
-          </div>
-        )}
-        {error && (
-          <div className="Error">{error}</div>
-        )}
+        <Weather />
+        <Route exact path="/playlists/:meteo" component={Playlists} />
+        <Route path="/tracks/:id" component={Tracks} />
       </div>
     );
   }
 }
 
-App.propTypes = {
-  climate: PropTypes.string,
-  error: PropTypes.string
-};
-
 const mapStateToProps = state => {
-  return {
-    climate: state.weather.meteo,
-    error: state.weather.error
-  };
+  return state;
 };
 
-export default connect(mapStateToProps)(App);
+export default withRouter(connect(mapStateToProps)(App));

@@ -1,18 +1,15 @@
-import { actions } from '../actions';
+import { Actions } from '../actions';
 
-const initialState = {};
-
-const Weather = (state = initialState, action) => {
+const Weather = (state = {}, action) => {
   switch (action.type) {
-    case actions.WEATHER_SUCCESS:
-      return {
-        ...action.weather,
-        error: ''
-      };
+    case Actions.WEATHER_SUCCESS:
+      return { weather: action.weather };
 
-    case actions.WEATHER_ERROR:
+    case Actions.WEATHER_ERROR:
       return {
-        error: action.error
+        error: action.error.message
+          ? action.error.message
+          : action.error.statusText
       };
 
     default:

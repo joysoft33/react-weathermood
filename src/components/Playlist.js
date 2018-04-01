@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
-import { getTracks } from '../actions';
+import { push } from 'react-router-redux';
 
 import './Playlist.css';
 
@@ -31,9 +30,7 @@ Playlist.propTypes = {
 const mapStateToProps = state => state;
 
 const mapDispatchToProps = dispatch => ({
-  onClickPlaylist: id => {
-    dispatch(getTracks(id));
-  }
+  onClickPlaylist: id => dispatch(push(`/tracks/${id}`))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Playlist);

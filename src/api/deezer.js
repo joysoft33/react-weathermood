@@ -1,138 +1,173 @@
 /* eslint no-use-before-define: "off" */
 /* eslint no-var: "off" */
 
-const EVENTS = [
-  'current_track',
-  'player_paused',
-  'tracklist_changed',
-  'player_play',
-];
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
+import { Subject } from 'rxjs/Subject';
 
+import { Actions } from '../actions';
+
+const DZ_EVENTS = ['current_track', 'player_paused', 'player_play'];
+
+export const [DZ_CURRENT, DZ_PAUSED, DZ_PLAY] = DZ_EVENTS;
+
+const DZ_SCRIPT = 'https://e-cdns-files.dzcdn.net/js/min/dz.js';
 const CHANNEL_URL = 'http://localhost:3000/channel.html';
 const APP_ID = '229702';
 
-let loaded = false;
-let DZ;
+class Deezer {
+  constructor() {
+    this.DZ = null;
+    this.eventSource = new Subject();
+    this.loaded = new BehaviorSubject(false);
+    this.$events = this.eventSource.asObservable();
+    const self = this;
 
-function initialize() {
-  window.dzAsyncInit = () => {
+    window.dzAsyncInit = () => {
+      self.DZ = window.DZ;
 
-    DZ = window.DZ;
+      self.DZ.init({
+        appId: APP_ID,
+        channelUrl: CHANNEL_URL,
+        player: {
+          onload: () => {
+            console.log('DZ init done');
+            for (const evt of DZ_EVENTS) {
+              self.DZ.Event.subscribe(evt, self.playerNotification);
+            }
+            self.loaded.next(true);
+          }
+        }
+      });
+    };
 
-    DZ.init({
-      appId: APP_ID,
-      channelUrl: CHANNEL_URL,
-      player: true,
+    const e = document.createElement('script');
+    e.src = DZ_SCRIPT;
+    e.async = true;
+    document.getElementById('dz-root').appendChild(e);
+  }
+
+  /**
+   * Search for playlists corresponding to the given keyword
+   */
+  getPlaylists(key) {
+    console.log(`getPlaylists ${key}`);
+    return Observable.create(observer => {
+      this.whenLoaded(() => {
+        this.DZ.api(
+          `/search/playlist?q=${encodeURIComponent(key)}`,
+          response => {
+            if (response.data) {
+              const playlists = response.data.map(data =>
+                this.convertPlaylist(data)
+              );
+              observer.next(playlists);
+            } else {
+              const message = response.error ? response.error.message : 'error';
+              observer.throw(message);
+            }
+          }
+        );
+      });
     });
+  }
 
-    DZ.Event.subscribe('player_loaded', () => {
-      console.log('Deezer init done');
-      for (const evt of EVENTS) {
-        DZ.Event.subscribe(evt, playerNotification);
+  /**
+   * Select and play the requested playlist
+   */
+  playPlaylist(id, index = 0) {
+    console.log(`playPlaylist ${id}`);
+    return Observable.create(observer => {
+      this.whenLoaded(() => {
+        this.DZ.player.playPlaylist(id, index, response => {
+          if (response.tracks) {
+            const tracks = response.tracks.map(data => this.convertTrack(data));
+            observer.next(tracks);
+          } else {
+            const message = response.error ? response.error.message : 'error';
+            observer.throw(message);
+          }
+        });
+      });
+    });
+  }
+
+  /**
+   * DZ player commands
+   */
+  trackNext() {
+    this.whenLoaded(() => {
+      this.DZ.player.next();
+    });
+  }
+
+  trackPlay() {
+    this.whenLoaded(() => {
+      this.DZ.player.play();
+    });
+  }
+
+  trackPause() {
+    this.whenLoaded(() => {
+      this.DZ.player.pause();
+    });
+  }
+
+  /**
+   * Execute the supplied callback when DZ API is loaded
+   */
+  whenLoaded = callback => {
+    this.loaded.asObservable().subscribe(function cb(isLoaded) {
+      if (isLoaded) {
+        this._unsubscribe();
+        callback();
       }
-      loaded = true;
     });
   };
 
-  const e = document.createElement('script');
-  e.src = 'https://e-cdns-files.dzcdn.net/js/min/dz.js';
-  e.async = true;
-  document.getElementById('dz-root').appendChild(e);
+  /**
+   * Convert Deezer playlist into internal one
+   * @param data
+   */
+  convertPlaylist = data => ({
+    id: data.id,
+    title: data.title,
+    tracksCount: data.nb_tracks,
+    pictureUrl: data.picture_medium
+  });
+
+  /**
+   * Convert Deezer track into internal one
+   * @param data
+   */
+  convertTrack = data => ({
+    id: data.id,
+    title: data.title,
+    artistName: data.artist.name,
+    albumTitle: data.album.title
+  });
+
+  /**
+   * Receive DZ player notifications
+   */
+  playerNotification = (data, event) => {
+    switch (event) {
+      case DZ_CURRENT:
+        this.eventSource.next({
+          type: Actions.TRACKS_CURRENT,
+          current: data.index
+        });
+        break;
+      case DZ_PAUSED:
+        this.eventSource.next({ type: Actions.TRACKS_PAUSE });
+        break;
+      case DZ_PLAY:
+        this.eventSource.next({ type: Actions.TRACKS_PLAY });
+        break;
+      default:
+        break;
+    }
+  };
 }
 
-initialize();
-
-/**
- * Search for playlists corresponding to the given keyword
- */
-export const getPlaylists = (key, callback) => {
-  console.log(`Searching for playlist with ${key}`);
-  DZ.api(`/search/playlist?q=${encodeURIComponent(key)}`, response => {
-    if (response.data) {
-      console.log(`${response.data.length} playlists received`);
-      // Convert the received data into a Playlist objects list
-      const playlists = response.data.map(data => convertPlaylist(data));
-      callback(null, playlists);
-    } else {
-      const message = response.error ? response.error.message : 'error';
-      console.log('Playlist search error', message);
-      callback(message, null);
-    }
-  });
-};
-
-/**
- * Select and play the requested playlist
- */
-export const getTracks = (id, callback) => {
-  console.log(`Playing playlist ${id}`);
-  DZ.player.playPlaylist(id, 0, response => {
-    if (response.tracks) {
-      // Convert the received data into a Track objects list
-      const tracks = response.tracks.map(data => convertTrack(data));
-      callback(null, tracks);
-    } else {
-      const message = response.error ? response.error.message : 'error';
-      console.log('Playlist play error', message);
-      callback(message, null);
-    }
-  });
-};
-
-/**
- * DZ player commands
- */
-export const trackNext = (callback) => {
-  DZ.player.next();
-  callback();
-};
-
-export const trackPlay = (callback) => {
-  DZ.player.play();
-  callback();
-};
-
-export const trackPause = (callback) => {
-  DZ.player.pause();
-  callback();
-};
-
-/**
- * Receive DZ player notifications
- */
-const playerNotification = (data, event) => {
-  console.log(event);
-  // switch (event) {
-  //   case 'current_track':
-  //     this.eventSource.next(new TrackNewEvent(convertTrack(data.track)));
-  //     break;
-  //   case 'player_paused':
-  //     this.eventSource.next(new TrackPauseEvent());
-  //     break;
-  //   case 'player_play':
-  //     this.eventSource.next(new TrackPlayEvent());
-  //     break;
-  // }
-};
-
-/**
- * Convert Deezer playlist into internal one
- * @param data
- */
-const convertPlaylist = data => ({
-  id: data.id,
-  title: data.title,
-  tracksCount: data.nb_tracks,
-  pictureUrl: data.picture_medium,
-});
-
-/**
- * Convert Deezer track into internal one
- * @param data
- */
-const convertTrack = data => ({
-  id: data.id,
-  title: data.title,
-  artistName: data.artist.name,
-  albumTitle: data.album.title,
-});
+export default new Deezer();
