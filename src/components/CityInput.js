@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-
-import { cityChanged } from '../actions';
+import { push } from 'react-router-redux';
 
 import './CityInput.css';
 
@@ -27,6 +26,7 @@ class CityInput extends React.Component {
           <input ref={node => (this.city = node)} defaultValue={this.city} />
           <button type="submit">GO!</button>
         </form>
+        {this.props.error && (<div className="Error">{this.props.error}</div>)}
       </div>
     );
   }
@@ -34,15 +34,17 @@ class CityInput extends React.Component {
 
 CityInput.propTypes = {
   cityChanged: PropTypes.func.isRequired,
+  error: PropTypes.string,
   city: PropTypes.string
 };
 
 const mapStateToProps = state => ({
+  error: state.weather.error,
   city: state.city
 });
 
 const mapDispatchToProps = dispatch => ({
-  cityChanged: city => dispatch(cityChanged(city))
+  cityChanged: city => dispatch(push(`/${city}/playlists`))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CityInput);

@@ -1,10 +1,8 @@
-import { push } from 'react-router-redux';
 import 'rxjs/add/operator/first';
 
 import api from '../api';
 
 export const Actions = {
-  CITY_CHANGED: 'CITY_CHANGED',
   WEATHER_SUCCESS: 'WEATHER_SUCCESS',
   WEATHER_ERROR: 'WEATHER_ERROR',
   PLAYLISTS_SUCCESS: 'PLAYLISTS_SUCCESS',
@@ -17,15 +15,9 @@ export const Actions = {
   TRACKS_NEXT: 'TRACKS_NEXT'
 };
 
-export const cityChanged = city => dispatch =>
-  dispatch({ type: Actions.CITY_CHANGED, city });
-
 export const getWeather = city => dispatch =>
   api.Weather.getWeather(city)
-    .then(weather => {
-      dispatch({ type: Actions.WEATHER_SUCCESS, weather });
-      dispatch(push(`/playlists/${weather.meteo}`));
-    })
+    .then(weather => dispatch({ type: Actions.WEATHER_SUCCESS, weather }))
     .catch(error => dispatch({ type: Actions.WEATHER_ERROR, error }));
 
 export const getPlaylists = key => dispatch =>

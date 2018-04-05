@@ -1,13 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { push } from 'react-router-redux';
 
 import './Playlist.css';
 
-const Playlist = ({ playlist, onClickPlaylist }) => {
+const Playlist = ({ playlist, select }) => {
+
   return (
-    <div className="Playlist" onClick={() => onClickPlaylist(playlist.id)}>
+    <div className="Playlist" onClick={() => select(playlist.id)}>
       <img src={playlist.pictureUrl} alt={playlist.id} />
       <div className="infos">
         <p>{playlist.title}</p>
@@ -18,7 +17,7 @@ const Playlist = ({ playlist, onClickPlaylist }) => {
 };
 
 Playlist.propTypes = {
-  onClickPlaylist: PropTypes.func.isRequired,
+  select: PropTypes.func.isRequired,
   playlist: PropTypes.shape({
     id: PropTypes.number.isRequired,
     title: PropTypes.string.isRequired,
@@ -27,10 +26,4 @@ Playlist.propTypes = {
   })
 };
 
-const mapStateToProps = state => state;
-
-const mapDispatchToProps = dispatch => ({
-  onClickPlaylist: id => dispatch(push(`/tracks/${id}`))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Playlist);
+export default Playlist;

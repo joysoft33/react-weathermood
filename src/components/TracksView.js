@@ -5,14 +5,16 @@ import { withRouter } from 'react-router-dom';
 import { push } from 'react-router-redux';
 
 import api from '../api';
-import PlayCommands from './PlayCommands';
 import { getTracks, changeTrack } from '../actions';
 
-import './Tracks.css';
+import PlayCommands from './PlayCommands';
+import Track from './Track';
 
-class Tracks extends React.Component {
+import './TracksView.css';
+
+class TracksView extends React.Component {
   componentWillMount() {
-    this.subscription = api.Deezer.$events.subscribe(this.notifications);
+    this.subscription = api.Deezer.$events.subscribe(this.notification);
     this.props.getTracks(this.props.playlistId);
   }
 
@@ -20,45 +22,41 @@ class Tracks extends React.Component {
     this.subscription.unsubscribe();
   }
 
-  notifications = event => {
+  notification = event => {
     this.props.notify(event);
   };
 
-  play = (index) => {
-    this.props.play(this.props.playlistId, index);
-  };
-
   stop = () => {
-    this.props.stop();
+    this.props.stop(this.props.city);
   };
 
   render() {
-    const { tracks, current } = this.props;
+    const { tracks, current, playlistId, play } = this.props;
     return (
-      <div className="Tracks">
+      <div className="TracksView">
         <PlayCommands onPlayStop={this.stop} />
-        <table>
-          <tbody>
-            {tracks.map((item, index) => (
-              <tr key={item.id} className={index === current ? 'active' : ''} onClick={() => this.play(index)} >
-                <td>{item.artistName}</td>
-                <td>{item.title}</td>
-                <td>{item.albumTitle}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="Tracks">
+          {tracks.map((item, index) => (
+            <Track
+              key={item.key}
+              play={() => play(playlistId, index)}
+              current={index === current}
+              {...item}
+            />
+          ))}
+        </div>
       </div>
     );
   }
 }
 
-Tracks.propTypes = {
+TracksView.propTypes = {
   play: PropTypes.func.isRequired,
   stop: PropTypes.func.isRequired,
   notify: PropTypes.func.isRequired,
   getTracks: PropTypes.func.isRequired,
   playlistId: PropTypes.number.isRequired,
+  city: PropTypes.string.isRequired,
   current: PropTypes.number,
   tracks: PropTypes.arrayOf(
     PropTypes.shape({
@@ -70,18 +68,21 @@ Tracks.propTypes = {
   )
 };
 
-const mapStateToProps = (state, { match }) => {
-  return {
-    playlistId: +match.params.id,
-    ...state.tracks
-  };
-};
+const mapStateToProps = (state, { match }) => ({
+  playlistId: +match.params.id,
+  city: match.params.city,
+  ...state.tracks
+});
 
 const mapDispatchToProps = dispatch => ({
-  play: (playlistId, trackId) => dispatch(changeTrack(playlistId, trackId)),
-  stop: () => dispatch(push('/playlists')),
+  play: (playlistId, index) => {
+    return dispatch(changeTrack(playlistId, index));
+  },
+  stop: city => dispatch(push(`/${city}/playlists`)),
   getTracks: playlistId => dispatch(getTracks(playlistId)),
   notify: event => dispatch(event)
 });
 
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Tracks));
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(TracksView)
+);

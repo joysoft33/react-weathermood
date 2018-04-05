@@ -1,22 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
 
 import { getWeather } from '../actions';
 
 import './Weather.css';
 
 class Weather extends React.Component {
+  componentDidMount() {
+    this.props.getWeather(this.props.city);
+  }
 
   componentWillReceiveProps(nextProps) {
-    console.log('Weather component props changed');
     if (nextProps.city !== this.props.city) {
       this.props.getWeather(nextProps.city);
     }
   }
 
   render() {
-    const { weather, error } = this.props;
+    const { weather } = this.props;
     return weather ? (
       <div className="Weather">
         <img src={weather.icon} alt="meteo" />
@@ -41,18 +44,15 @@ class Weather extends React.Component {
           </tbody>
         </table>
       </div>
-    ) : error ? (
-      <div className="Error">{error}</div>
     ) : (
-      <div />
+      <div>Meteo unknown</div>
     );
   }
 }
 
 Weather.propTypes = {
   getWeather: PropTypes.func.isRequired,
-  city: PropTypes.string,
-  error: PropTypes.string,
+  city: PropTypes.string.isRequired,
   weather: PropTypes.shape({
     city: PropTypes.string,
     meteo: PropTypes.string,
@@ -62,14 +62,15 @@ Weather.propTypes = {
   })
 };
 
-const mapStateToProps = state => ({
-  city: state.city,
-  error: state.weather.error,
-  weather: state.weather.weather
+const mapStateToProps = (state, { match }) => ({
+  city: match.params.city,
+  ...state.weather
 });
 
 const mapDispatchToProps = dispatch => ({
   getWeather: city => dispatch(getWeather(city))
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Weather);
+export default withRouter(
+  connect(mapStateToProps, mapDispatchToProps)(Weather)
+);

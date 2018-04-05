@@ -1,29 +1,24 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { Route, withRouter } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
-import Navbar from './Navbar';
+import PlaylistsView from './PlaylistsView';
+import TracksView from './TracksView';
 import Weather from './Weather';
-import Playlists from './Playlists';
-import Tracks from './Tracks';
+import Navbar from './Navbar';
 
 import './App.css';
 
-class App extends React.Component {
-  render() {
-    return (
-      <div>
-        <Navbar />
-        <Weather />
-        <Route exact path="/playlists/:meteo" component={Playlists} />
-        <Route path="/tracks/:id" component={Tracks} />
-      </div>
-    );
-  }
-}
-
-const mapStateToProps = state => {
-  return state;
+const App = () => {
+  return (
+    <div>
+      <Navbar />
+      <Route path="/:city" component={Weather} />
+      <Switch>
+        <Route exact path="/:city/playlists" component={PlaylistsView} />
+        <Route path="/:city/playlists/:id" component={TracksView} />
+      </Switch>
+    </div>
+  );
 };
 
-export default withRouter(connect(mapStateToProps)(App));
+export default App;

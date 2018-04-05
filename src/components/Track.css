@@ -1,0 +1,14 @@
+.Track {
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+.Track:hover {
+  background-color: #eee;
+  cursor: pointer;
+}
+.Track.active {
+  background-color: #ccc;
+}
+.Track span {
+  padding: 15px;
+}
