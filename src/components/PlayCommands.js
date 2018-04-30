@@ -10,7 +10,9 @@ const PlayCommands = props => {
   const { playing, onPlayStart, onPlayPause, onPlayNext, onPlayStop } = props;
   return (
     <div className="PlayCommands">
-      <button onClick={playing ? onPlayPause : onPlayStart}>{playing ? 'Pause' : 'Play'}</button>
+      <button onClick={playing ? onPlayPause : onPlayStart}>
+        {playing ? 'Pause' : 'Play'}
+      </button>
       <button onClick={onPlayNext}>Next</button>
       <button onClick={onPlayStop}>Stop</button>
     </div>

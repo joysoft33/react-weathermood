@@ -23,7 +23,7 @@ class PlaylistsView extends React.Component {
     }
   }
 
-  select = (id) => {
+  select = id => {
     this.props.selectPlaylist(this.props.city, id);
   };
 
@@ -31,11 +31,7 @@ class PlaylistsView extends React.Component {
     return (
       <div className="PlaylistsView">
         {this.props.playlists.map(item => (
-          <Playlist
-            key={item.id}
-            playlist={item}
-            select={this.select}
-          />
+          <Playlist key={item.id} playlist={item} select={this.select} />
         ))}
       </div>
     );

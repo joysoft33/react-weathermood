@@ -26,7 +26,7 @@ class CityInput extends React.Component {
           <input ref={node => (this.city = node)} defaultValue={this.city} />
           <button type="submit">GO!</button>
         </form>
-        {this.props.error && (<div className="Error">{this.props.error}</div>)}
+        {this.props.error && <div className="Error">{this.props.error}</div>}
       </div>
     );
   }

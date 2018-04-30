@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import './Playlist.css';
 
 const Playlist = ({ playlist, select }) => {
-
   return (
     <div className="Playlist" onClick={() => select(playlist.id)}>
       <img src={playlist.pictureUrl} alt={playlist.id} />

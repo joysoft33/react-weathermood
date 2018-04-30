@@ -5,7 +5,7 @@ import './Track.css';
 
 const Track = ({ title, artistName, albumTitle, current, play }) => {
   return (
-    <div className={current ? 'Track active' : 'Track'} onClick={play} >
+    <div className={current ? 'Track active' : 'Track'} onClick={play}>
       <span>{artistName}</span>
       <span>{title}</span>
       <span>{albumTitle}</span>
