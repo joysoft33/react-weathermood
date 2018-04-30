@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import createHistory from 'history/createBrowserHistory';
+import { createBrowserHistory } from 'history';
 import { ConnectedRouter } from 'react-router-redux';
 
 import App from './components/App';
@@ -12,7 +12,7 @@ import configureStore from './utilities/configureStore';
 import './index.css';
 
 // Create a browser history
-const history = createHistory();
+const history = createBrowserHistory();
 const store = configureStore(history);
 const root = document.getElementById('root');
 
